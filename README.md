@@ -47,21 +47,28 @@ Run everything from the repo root, e.g. `source("code/slide12_multinomial_model.
 
 ## Data
 
-- **hoopR / NBA stats:** pulled live by the scripts that use them.
-- **`data/all_seasons.csv`:** the Kaggle "NBA Players" dataset, downloaded separately (see `code/slide07_height_by_year.R`). Not included here.
-- **`data/historical_data.csv`:** per-player season stats from Basketball-Reference, used for slides 10–17. Not included, because the original scraping script wasn't kept. Rebuilding it is the first item on the to-do list below.
+- **`data/historical_data.csv`** (included). One row per NBA player-season, 1997–2024, combining
+  Basketball-Reference advanced, per-game and shooting stats. Rebuild it with
+  `source("scripts/build_historical_data.R")`, which pulls from Sumitro Datta's Basketball-Reference
+  dataset: the same Kaggle dataset the deck cites, mirrored on
+  [GitHub](https://github.com/sumitrodatta/bball-reference-datasets). Players traded mid-season are
+  counted once, using their combined-season row.
+- **hoopR / NBA stats.** Slides 2–6 and 9 pull this live.
+- **`data/all_seasons.csv`** (slide 7 only). The Kaggle "NBA Players" dataset, downloaded separately.
 
 ## Honest notes on reproducibility
 
-This code is a cleaned-up rebuild of the original competition code, and not every number matches the deck:
+This is a cleaned-up rebuild of the original camp code, and not every number matches the deck:
 
 - **Slide 2 matches.** Slope 0.0956 vs 0.0957, R² 0.905 vs 0.904.
-- **Model accuracy is lower.** The rebuilt model gets **65.6%**, below the deck's 73.6%. It's the same method, but the original used a larger Kaggle dataset. The biggest predictors are the same: effective FG%, defensive rebounds and assists.
-- **Slides 15–17 used a different model in the deck.** The original versions came from a random forest, not the multinomial model. With the multinomial model, the Jokić result holds (old-school model: PF 71.5%; main model: C 66.2%), and so does the "centers are more spread out" result. The deck's claim that Al Horford rated as a center in 2015 does not come back.
-- **The old-school window differs.** The deck describes the old-school model as trained on 2000–2010; this code uses 2010–2015, set in one place in `slide12`.
+- **Model accuracy is lower.** The rebuilt model gets **66.6%** on a held-out 20% split, below the deck's 73.6%. It's the same method, but the data was rebuilt from today's version of the dataset. The biggest predictors are the same: effective FG%, defensive rebounds and assists.
+- **Slides 15–17 used a random forest in the deck.** With the multinomial model:
+  - **Jokić holds.** The old-school model reads his 2024 season as a PF (69.0%); the main model reads it as a C (76.1%).
+  - **"Centers are more spread out" holds.** The average spread of centers' probabilities drops from 0.319 (2000) to 0.301 (2024).
+  - **Horford doesn't hold.** He reads as a PF in both 2015 and 2024 (his center probability falls from 10% to 5%). The deck's claim that he rated as a center in 2015 does not come back.
+- **The old-school window differs.** The deck describes it as 2000–2010; this code uses 2010–2015, set in one place in `slide12`.
 
 ## What I'd do next
 
-- Rebuild the Basketball-Reference dataset with a script so every slide runs end to end.
 - Evaluate on held-out seasons instead of a random split.
 - Compare multinomial vs random forest on the same data.
